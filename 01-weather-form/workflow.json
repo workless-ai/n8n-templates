@@ -1,0 +1,99 @@
+{
+  "name": "Weather check",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Weather check",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "City"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        0,
+        0
+      ],
+      "id": "64cff08a-2f77-4c75-8369-05fbb82b8553",
+      "name": "On form submission"
+    },
+    {
+      "parameters": {
+        "url": "=https://wttr.in/{{ $json.City }}?format=3",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "923b4776-ace8-4b74-9924-b3d7104e9db7",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Your weather",
+        "completionMessage": "={{ $json.data }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        448,
+        0
+      ],
+      "id": "7d5d45ec-02ed-476c-98dd-61eb72f10da2",
+      "name": "Form"
+    },
+    {
+      "parameters": {
+        "content": "## Weather check\n1. Click **Execute** at the bottom.\n2. Type a city in the form that opens.\n3. You get its weather back.\n\nUses wttr.in: no account, no API key.\nFree template by Workless.",
+        "height": 180,
+        "width": 420,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -260
+      ],
+      "id": "workless-note",
+      "name": "How to use"
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

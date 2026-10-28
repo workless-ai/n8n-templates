@@ -6,16 +6,16 @@ Every workflow here was built and tested in a real n8n install for its video. No
 
 ## How to import a workflow
 
-1. Open the video's folder and the `workflow.json` file, then click **Download raw file** (or **Raw** and copy everything).
-2. In n8n, open an empty workflow and paste with **Ctrl/Cmd + V**, or use **⋯ → Import from File**.
+1. Open the video's folder and the `workflow.json` file, then click **Download raw file**.
+2. In n8n, create a new workflow, then go to **⋯ → Import → From file** and choose the file. If n8n asks *"Importing this from an AI tool?"*, click **Skip**.
 3. Open each node with a warning and connect **your own** credentials (Gmail, Google Sheets, Gemini…). No credentials or keys are included.
-4. Click **Execute workflow** once to test, then **Publish**.
+4. Click **Execute** once to test, then **Publish**.
 
 ## Workflows
 
 | # | Video | Folder |
 |---|---|---|
-| | Coming with the first videos | |
+| 01 | n8n's one-command install: weather check form | [01-weather-form](01-weather-form) |
 
 ## Notes
 
