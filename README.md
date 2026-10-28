@@ -18,6 +18,7 @@ Every workflow here was built and tested in a real n8n install for its video. No
 | 01 | n8n's one-command install: weather check form | [01-weather-form](01-weather-form) |
 | 02 | Connect Gmail to self-hosted n8n (checklist, no workflow) | [02-gmail-connect](02-gmail-connect) |
 | 03 | Auto-label Gmail with free AI (Gemini) | [03-gmail-ai-sorter](03-gmail-ai-sorter) |
+| 04 | Receipt photo → Google Sheets with free AI (Telegram bot) | [04-telegram-receipts](04-telegram-receipts) |
 
 ## Notes
 
