@@ -1,0 +1,189 @@
+{
+  "name": "AI inbox sorter",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": true,
+        "filters": {
+          "q": "from:me to:me"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "gmail-trigger",
+      "name": "Gmail Trigger"
+    },
+    {
+      "parameters": {
+        "inputText": "=From: {{ $json.From }}\nSubject: {{ $json.Subject }}\n{{ $json.snippet }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Clients",
+              "description": "Messages from customers about their projects or work"
+            },
+            {
+              "category": "Invoices",
+              "description": "Bills, receipts, and payment confirmations"
+            },
+            {
+              "category": "Newsletters",
+              "description": "Newsletters, promotions, and mailing lists"
+            }
+          ]
+        },
+        "options": {
+          "fallback": "other"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        320,
+        0
+      ],
+      "id": "text-classifier",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        380,
+        260
+      ],
+      "id": "google-gemini-chat-model",
+      "name": "Google Gemini Chat Model"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": []
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        760,
+        -220
+      ],
+      "id": "label-clients",
+      "name": "Label: Clients"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": []
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        760,
+        0
+      ],
+      "id": "label-invoices",
+      "name": "Label: Invoices"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": []
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        760,
+        220
+      ],
+      "id": "label-newsletters",
+      "name": "Label: Newsletters"
+    },
+    {
+      "parameters": {
+        "content": "## AI inbox sorter\n1. Open each Gmail node and connect your Gmail. Open the Gemini model and add your free Gemini API key.\n2. Create the labels Clients, Invoices and Newsletters in Gmail, then pick one in each Label node.\n3. Click **Publish**.\n\nIt only watches emails you send yourself (`from:me to:me`) until you clear that Search filter.\nFree template by Workless.",
+        "height": 240,
+        "width": 520,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -560
+      ],
+      "id": "workless-note",
+      "name": "How to use"
+    }
+  ],
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "Label: Clients",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Label: Invoices",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Label: Newsletters",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

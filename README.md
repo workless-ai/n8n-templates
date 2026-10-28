@@ -16,6 +16,7 @@ Every workflow here was built and tested in a real n8n install for its video. No
 | # | Video | Folder |
 |---|---|---|
 | 01 | n8n's one-command install: weather check form | [01-weather-form](01-weather-form) |
+| 03 | Auto-label Gmail with free AI (Gemini) | [03-gmail-ai-sorter](03-gmail-ai-sorter) |
 
 ## Notes
 
