@@ -20,6 +20,15 @@ Send a receipt photo to your own Telegram bot. Free AI (Google Gemini) reads it,
 5. In **Append row in sheet** and **Get row(s) in sheet**, replace the placeholder link under **Document** with your sheet's link. The column mapping is already filled in, and it stays when you paste your link.
 6. Click **Publish**, open your bot in Telegram, and send it a receipt photo.
 
+## /total report text
+
+The video says this expression is in the description, but YouTube doesn't allow its `=>` arrows there, so here it is. It's already set up in the template's **Send the total** node (Expression mode, with **Execute Once** on in Settings):
+
+```
+Spending by category:
+{{ $input.all().map(i => i.json.Category + ': ' + i.json.sum_Total.toFixed(2)).join('\n') + '\n\nTotal: ' + $input.all().reduce((a, i) => a + i.json.sum_Total, 0).toFixed(2) }}
+```
+
 ## Good to know
 
 - **The prompt includes today's date, which isn't in the video.** We tested a receipt that prints only "29 OCT". Without the date in the prompt, Gemini filled in the wrong year (2024) all 3 times. With it, all 3 were correct (2026).
