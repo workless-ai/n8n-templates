@@ -1,0 +1,196 @@
+{
+  "name": "Morning brief: Hacker News → Gemini → Gmail",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "id": "07663b38-497d-4494-9523-7f8d40483577",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -448,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://news.ycombinator.com/rss",
+        "options": {}
+      },
+      "id": "4f9721df-f5f4-448b-ba5e-c1605c612369",
+      "name": "RSS Read",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -224,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "maxItems": 10
+      },
+      "id": "18107854-9d67-4ce9-a9bc-50f145083f7e",
+      "name": "Limit",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        16,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "title"
+            },
+            {
+              "fieldToAggregate": "link"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ef19f5f2-9206-4750-8054-68f09107951e",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        240,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "models/gemini-3.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are writing a short daily tech briefing for a freelancer. Based on the Hacker News stories below, write exactly 5 short bullet points (one line each) highlighting what matters most to a freelancer: tools, trends, opportunities or risks. Start each bullet with \"- \" and include the story link in brackets at the end of the bullet. Return only the 5 bullets, with no intro or outro.\n\nStories:\n{{ $json.title.map((t, i) => '- ' + t + ' (' + $json.link[i] + ')').join('\\n') }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "41cf3c74-28cd-4eb6-b355-023c4d17c2be",
+      "name": "Message a model",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        16
+      ],
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "sendTo": "YOUR EMAIL ADDRESS",
+        "subject": "Your daily Hacker News briefing for freelancers",
+        "emailType": "text",
+        "message": "={{ $json.content.parts[0].text }}",
+        "options": {}
+      },
+      "id": "5774d6e4-d768-4839-a740-22f6bdf3ef46",
+      "name": "Send a message",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Morning brief (free)\n1. Gemini node: pick your free Gemini key (aistudio.google.com).\n2. Gmail node: connect Gmail and put your address in To.\n3. ⋯ → Settings → Timezone: yours.\n4. Execute once, read the email, then Publish.\nThe prompt and the video: see the README.",
+        "height": 180,
+        "width": 420,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -260
+      ],
+      "id": "workless-note",
+      "name": "How to use"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

@@ -19,6 +19,8 @@ Every workflow here was built and tested in a real n8n install for its video. No
 | 02 | Connect Gmail to self-hosted n8n (checklist, no workflow) | [02-gmail-connect](02-gmail-connect) |
 | 03 | Auto-label Gmail with free AI (Gemini) | [03-gmail-ai-sorter](03-gmail-ai-sorter) |
 | 04 | Receipt photo → Google Sheets with free AI (Telegram bot) | [04-telegram-receipts](04-telegram-receipts) |
+| 05 | Free AI builds your workflow: morning brief (Hacker News → Gemini → Gmail) | [05-morning-brief](05-morning-brief) |
+| 05 | Free AI builds your workflow: job alert (Gemini YES/NO → Gmail) | [05-job-alert](05-job-alert) |
 
 ## Notes
 

@@ -1,0 +1,287 @@
+{
+  "name": "Job alert: We Work Remotely → Gemini YES/NO → Gmail",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "cc73f892-86b4-4b05-8ce4-8456904294be",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -448,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://weworkremotely.com/categories/remote-design-jobs.rss",
+        "options": {}
+      },
+      "id": "102699e1-269b-4318-ae10-43140f9f231b",
+      "name": "RSS Read",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        -224,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "maxItems": 15
+      },
+      "id": "6f9d7a8a-0f61-4794-b14e-6575ba80ec1e",
+      "name": "Limit",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        16,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "models/gemini-3.5-flash-lite"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Is the following job a good fit for a freelance web designer? Answer with only YES or NO.\n\nTitle: {{ $json.title }}\n\nDescription: {{ $json.contentSnippet }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "2b349570-9669-4c06-87aa-88e1d40ddf27",
+      "name": "Message a model",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        16
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "title",
+              "value": "={{ $('Limit').item.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "a2",
+              "name": "link",
+              "value": "={{ $('Limit').item.json.link }}",
+              "type": "string"
+            },
+            {
+              "id": "a3",
+              "name": "answer",
+              "value": "={{ $json.content.parts[0].text.trim().toUpperCase() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6eb15d55-cf1f-4cda-a00a-0628796470e3",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{ $json.answer }}",
+              "rightValue": "YES",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "37903ae0-6a43-43f0-b2b0-79ad0c1dd370",
+      "name": "Filter",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.4,
+      "position": [
+        672,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "title"
+            },
+            {
+              "fieldToAggregate": "link"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "24593847-6693-48f7-9486-006396598b17",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        896,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "YOUR EMAIL ADDRESS",
+        "subject": "Remote design jobs for a freelance web designer",
+        "emailType": "text",
+        "message": "=Jobs that suit a freelance web designer:\n\n{{ $json.title.map((t, i) => t + ' - ' + $json.link[i]).join('\\n') }}",
+        "options": {}
+      },
+      "id": "e2b3c9ad-268f-4f43-b41e-19cd02776792",
+      "name": "Send a message",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Job alert (free)\n1. Gemini node: pick your free Gemini key. flash-lite keeps 15 calls/run inside the free limit.\n2. Edit the question in the Gemini node to match YOUR job.\n3. Gmail node: connect Gmail, put your address in To.\n4. ⋯ → Settings → Timezone, Execute once, then Publish.\nThe prompt and the video: see the README.",
+        "height": 180,
+        "width": 420,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -260
+      ],
+      "id": "workless-note",
+      "name": "How to use"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS Read": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
