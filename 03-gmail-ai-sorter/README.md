@@ -21,3 +21,21 @@ A free AI reads each new email and labels it **Clients**, **Invoices** or **News
 - **Change the categories:** edit them in the Text Classifier. A clear description for each one helps the AI most. Add a Label node for each new output.
 - **Free tier:** Gemini's free tier has daily limits, and Google may use what you send to improve its products.
 - **Self-hosted n8n with Gmail in "Testing" mode:** Google signs n8n out every 7 days, so open the credential and click **Reconnect** (video 2 explains this).
+
+## Copy-paste from the video
+
+YouTube doesn't allow curly brackets in descriptions, so the copy-paste text from the video lives here.
+
+Text to Classify (Expression):
+
+```
+From: {{ $json.From }}
+Subject: {{ $json.Subject }}
+{{ $json.snippet }}
+```
+
+Label step, Message ID (Expression):
+
+```
+{{ $json.id }}
+```

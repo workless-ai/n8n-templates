@@ -20,15 +20,6 @@ Send a receipt photo to your own Telegram bot. Free AI (Google Gemini) reads it,
 5. In **Append row in sheet** and **Get row(s) in sheet**, replace the placeholder link under **Document** with your sheet's link. The column mapping is already filled in, and it stays when you paste your link.
 6. Click **Publish**, open your bot in Telegram, and send it a receipt photo.
 
-## /total report text
-
-The video says this expression is in the description, but YouTube doesn't allow its `=>` arrows there, so here it is. It's already set up in the template's **Send the total** node (Expression mode, with **Execute Once** on in Settings):
-
-```
-Spending by category:
-{{ $input.all().map(i => i.json.Category + ': ' + i.json.sum_Total.toFixed(2)).join('\n') + '\n\nTotal: ' + $input.all().reduce((a, i) => a + i.json.sum_Total, 0).toFixed(2) }}
-```
-
 ## Good to know
 
 - **The prompt includes today's date, which isn't in the video.** We tested a receipt that prints only "29 OCT". Without the date in the prompt, Gemini filled in the wrong year (2024) all 3 times. With it, all 3 were correct (2026).
@@ -36,3 +27,48 @@ Spending by category:
 - **Self-hosted Google Sheets credential:** use the same Google Cloud steps as for Gmail ([02 checklist](../02-gmail-connect)), but enable the **Google Sheets API** instead of the Gmail API.
 - **Categories:** edit the list in the prompt (Meals, Office, Travel, Software, Other). A fixed list keeps your totals adding up.
 - **Free tier:** Gemini's free tier has daily limits, and Google may use what you send to improve its products. Don't send receipts you need to keep private.
+
+## Copy-paste from the video
+
+YouTube doesn't allow curly brackets in descriptions, so the copy-paste text from the video lives here.
+
+Prompt (Basic LLM Chain, Define below; switch the prompt to Expression for the date to work):
+
+```
+Read this receipt photo. Return the purchase date (YYYY-MM-DD), the shop name, the total paid, the currency code, and one category from: Meals, Office, Travel, Software, Other. Today is {{ $today.toFormat('yyyy-MM-dd') }}.
+```
+
+Structured Output Parser, JSON example:
+
+```
+{
+  "date": "2026-10-26",
+  "merchant": "Bean & Brew Cafe",
+  "total": 10.26,
+  "currency": "USD",
+  "category": "Meals"
+}
+```
+
+Switch rules: `{{ $json.message.photo }}` (Array → exists) and `{{ $json.message.text }}` (String → is equal to) `/total`
+
+Logged column:
+
+```
+{{ $now.toFormat('yyyy-MM-dd HH:mm') }}
+```
+
+Reply text:
+
+```
+Saved {{ $json.Currency }} {{ $json.Total }} at {{ $json.Merchant }} ({{ $json.Category }})
+```
+
+### /total report text
+
+Expression mode, with **Execute Once** on in the node's Settings (already set up in the template's **Send the total** node):
+
+```
+Spending by category:
+{{ $input.all().map(i => i.json.Category + ': ' + i.json.sum_Total.toFixed(2)).join('\n') + '\n\nTotal: ' + $input.all().reduce((a, i) => a + i.json.sum_Total, 0).toFixed(2) }}
+```

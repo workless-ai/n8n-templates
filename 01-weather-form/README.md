@@ -20,3 +20,13 @@ You'll get a line like `London: ☁️ +15°C`.
 
 - **Different weather format:** change `?format=3` in the HTTP Request URL. For example, `?format=4` adds wind ([all formats](https://github.com/chubin/wttr.in#one-line-output)).
 - **Always on:** click **Publish**. The form then gets a permanent link you can bookmark or share.
+
+## Copy-paste from the video
+
+YouTube doesn't allow curly brackets in descriptions, so the copy-paste text from the video lives here.
+
+Weather URL (HTTP Request node, Expression mode):
+
+```
+https://wttr.in/{{ $json.City }}?format=3
+```
